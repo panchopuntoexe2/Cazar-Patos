@@ -33,32 +33,6 @@ class LoginActivity : AppCompatActivity() {
             //Validaciones de datos requeridos y formatos
             if(!ValidarDatosRequeridos())
                 return@setOnClickListener
-            //Si pasa validación de datos requeridos, ir a pantalla principal
-            val intencion = Intent(this, MainActivity::class.java)
-            intencion.putExtra(EXTRA_LOGIN, email)
-            startActivity(intencion)
-        }
-        buttonNewUser.setOnClickListener{
-
-        }
-        mediaPlayer=MediaPlayer.create(this, R.raw.title_screen)
-        mediaPlayer.start()
-
-        manejadorArchivo = SharedPreferencesManager(this)
-        editTextEmail = findViewById(R.id.editTextEmail)
-        editTextPassword = findViewById(R.id.editTextPassword)
-        buttonLogin = findViewById(R.id.buttonLogin)
-        buttonNewUser = findViewById(R.id.buttonNewUser)
-        checkBoxRecordarme = findViewById(R.id.checkBoxRecordarme)
-
-        LeerDatosDePreferencias()
-
-        buttonLogin.setOnClickListener {
-            val email = editTextEmail.text.toString()
-            val clave = editTextPassword.text.toString()
-            //Validaciones de datos requeridos y formatos
-            if(!ValidarDatosRequeridos())
-                return@setOnClickListener
             //Guardar datos en preferencias.
             GuardarDatosEnPreferencias()
             //Si pasa validación de datos requeridos, ir a pantalla principal
@@ -71,6 +45,13 @@ class LoginActivity : AppCompatActivity() {
         }
         mediaPlayer=MediaPlayer.create(this, R.raw.title_screen)
         mediaPlayer.start()
+
+        //manejadorArchivo = SharedPreferencesManager(this)
+        manejadorArchivo = EncriptedSharedPreferencesManager(this)
+        checkBoxRecordarme = findViewById(R.id.checkBoxRecordarme)
+
+        LeerDatosDePreferencias()
+
 
 
     }
