@@ -8,8 +8,8 @@ android {
 
     defaultConfig {
         applicationId "com.hexagonal.cazarpatos"
-        minSdk 27
-        targetSdk 30
+        minSdk 28
+        targetSdk 31
         versionCode 1
         versionName "1.0"
 
