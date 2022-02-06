@@ -7,18 +7,29 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class LoginActivity : AppCompatActivity() {
 
     lateinit var editTextEmail: EditText
-    lateinit var editTextPassword:EditText
-    lateinit var buttonLogin:Button
+    lateinit var editTextPassword: EditText
+    lateinit var buttonLogin: Button
     lateinit var buttonNewUser: Button
     lateinit var mediaPlayer: MediaPlayer
     lateinit var manejadorArchivo: FileHandler
     lateinit var checkBoxRecordarme: CheckBox
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // ...
+        // Initialize Firebase Auth
+        auth = Firebase.auth
+
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         //Inicialización de variables
@@ -30,8 +41,9 @@ class LoginActivity : AppCompatActivity() {
         buttonLogin.setOnClickListener {
             val email = editTextEmail.text.toString()
             val clave = editTextPassword.text.toString()
+            AutenticarUsuario(email, clave)
             //Validaciones de datos requeridos y formatos
-            if(!ValidarDatosRequeridos())
+            if (!ValidarDatosRequeridos())
                 return@setOnClickListener
             //Guardar datos en preferencias.
             GuardarDatosEnPreferencias()
@@ -40,10 +52,10 @@ class LoginActivity : AppCompatActivity() {
             intencion.putExtra(EXTRA_LOGIN, email)
             startActivity(intencion)
         }
-        buttonNewUser.setOnClickListener{
+        buttonNewUser.setOnClickListener {
 
         }
-        mediaPlayer=MediaPlayer.create(this, R.raw.title_screen)
+        mediaPlayer = MediaPlayer.create(this, R.raw.title_screen)
         mediaPlayer.start()
 
         //manejadorArchivo = SharedPreferencesManager(this)
@@ -53,34 +65,66 @@ class LoginActivity : AppCompatActivity() {
         LeerDatosDePreferencias()
 
 
-
     }
 
-    private fun GuardarDatosEnPreferencias(){
+    fun SignUpNewUser(email:String, password:String){
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    Toast.makeText(baseContext, "New user saved.",
+                        Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(baseContext, task.exception!!.message,
+                        Toast.LENGTH_SHORT).show()
+                }
+
+                // ...
+            }
+    }
+
+
+    fun AutenticarUsuario(email:String, password:String){
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    var intent = Intent(this,MainActivity::class.java)
+                    intent.putExtra(LOGIN_KEY,auth.currentUser!!.email)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    Toast.makeText(baseContext, task.exception!!.message,
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+
+
+    private fun GuardarDatosEnPreferencias() {
         val email = editTextEmail.text.toString()
         val clave = editTextPassword.text.toString()
-        val listadoAGrabar:Pair<String,String>
-        if(checkBoxRecordarme.isChecked){
+        val listadoAGrabar: Pair<String, String>
+        if (checkBoxRecordarme.isChecked) {
             listadoAGrabar = email to clave
-        }
-        else{
-            listadoAGrabar ="" to ""
+        } else {
+            listadoAGrabar = "" to ""
         }
         manejadorArchivo.SaveInformation(listadoAGrabar)
     }
 
 
-    private fun LeerDatosDePreferencias(){
+    private fun LeerDatosDePreferencias() {
         val listadoLeido = manejadorArchivo.ReadInformation()
-        if(listadoLeido.first != null){
+        if (listadoLeido.first != null) {
             checkBoxRecordarme.isChecked = true
         }
-        editTextEmail.setText ( listadoLeido.first )
-        editTextPassword.setText ( listadoLeido.second )
+        editTextEmail.setText(listadoLeido.first)
+        editTextPassword.setText(listadoLeido.second)
     }
 
 
-    private fun ValidarDatosRequeridos():Boolean{
+    private fun ValidarDatosRequeridos(): Boolean {
         val email = editTextEmail.text.toString()
         val clave = editTextPassword.text.toString()
         if (email.isEmpty()) {
