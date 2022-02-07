@@ -15,6 +15,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.util.*
@@ -28,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     var anchoPantalla = 0
     var alturaPantalla = 0
     var gameOver = false
+
+    lateinit var mAdView : AdView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -60,6 +65,12 @@ class MainActivity : AppCompatActivity() {
                 moverPato()
             }, 500)
         }
+        MobileAds.initialize(this) {}
+
+        mAdView = findViewById(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
+
     }
     private fun inicializarPantalla() {
         // 1. Obtenemos el tamaño de la pantalla del dispositivo
